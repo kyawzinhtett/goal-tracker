@@ -5,25 +5,33 @@ const initialGoals = [
     id: 118836,
     goal: "🏆 Lose 20 lbs",
     tags: ["health", "fitness", "lifestyle"],
+    deadline: "2023-09-15",
   },
   {
     id: 933372,
     goal: "👩‍💻 Learn TypeScript",
     tags: ["programming", "software"],
+    deadline: "2023-09-25",
   },
   {
     id: 499476,
     goal: "💰 Find Remote Job",
     tags: ["work", "lifestyle"],
+    deadline: "2023-10-20",
   },
 ];
 
 const App = () => {
+  const [goals, setGoals] = useState(initialGoals);
   const [openAddGoal, setOpenAddGoal] = useState(false);
 
-  function handleOpenAddGoal() {
+  const handleOpenAddGoal = () => {
     setOpenAddGoal((prev) => !prev);
-  }
+  };
+
+  const handleAddGoal = (newGoal) => {
+    setGoals((goals) => [...goals, newGoal]);
+  };
 
   return (
     <>
@@ -31,13 +39,18 @@ const App = () => {
       <div className="container-fluid p-3">
         <div className="row">
           <div className="col-md-9">
-            <List />
+            <List goals={goals} />
           </div>
           <div className="col-md-3">
             <Button onClick={handleOpenAddGoal}>
               {openAddGoal ? "Close" : "New Goal"}
             </Button>
-            {openAddGoal && <AddGoalForm />}
+            {openAddGoal && (
+              <AddGoalForm
+                onAddGoal={handleAddGoal}
+                onOpenAddGoal={setOpenAddGoal}
+              />
+            )}
           </div>
         </div>
       </div>
@@ -65,26 +78,31 @@ const Navbar = () => {
   );
 };
 
-const List = () => {
-  const goalLists = initialGoals;
+const List = ({ goals }) => {
   return (
     <div className="row">
-      {goalLists.map((goalList) => (
-        <Goal key={goalList.id} goal={goalList.goal} tags={goalList.tags} />
+      {goals.map((goal) => (
+        <Goal
+          key={goal.id}
+          goal={goal.goal}
+          tags={goal.tags}
+          deadline={goal.deadline}
+        />
       ))}
     </div>
   );
 };
 
-const Goal = ({ goal, tags }) => {
+const Goal = ({ goal, tags, deadline }) => {
   return (
     <div className="col-lg-3 col-md-4 col-sm-6">
-      <div className="card bg-light">
+      <div className="card bg-light mb-3">
         <div className="card-body">
           <h5 className="card-title pb-2">{goal}</h5>
           <div className="card-text">
+            <p>{deadline}</p>
             {tags.map((tag, index) => (
-              <small key={index} className="bg-warning rounded me-1">
+              <small key={index} className="bg-info rounded px-1 me-1">
                 {tag}
               </small>
             ))}
@@ -95,9 +113,42 @@ const Goal = ({ goal, tags }) => {
   );
 };
 
-const AddGoalForm = () => {
+const AddGoalForm = ({ onAddGoal, onOpenAddGoal }) => {
+  const [goal, setGoal] = useState("");
+  const [tags, setTags] = useState([]);
+  const [deadline, setDeadline] = useState("");
+
+  const handleTags = (e) => {
+    const inputTags = e.target.value;
+    const tagArray = inputTags.split(",").map((tag) => tag.trim());
+
+    setTags(tagArray);
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    if (!goal || !tags || !deadline) return;
+
+    const id = crypto.randomUUID();
+
+    const newGoal = {
+      id,
+      goal,
+      tags,
+      deadline,
+    };
+
+    onAddGoal(newGoal);
+
+    setGoal("");
+    setTags([]);
+    setDeadline("");
+    onOpenAddGoal(false);
+  };
+
   return (
-    <form className="bg-light rounded mt-3 p-4">
+    <form className="bg-light rounded mt-3 p-4" onSubmit={handleSubmit}>
       <div className="form-group mb-3">
         <label htmlFor="goal">Goal</label>
         <input
@@ -105,17 +156,34 @@ const AddGoalForm = () => {
           type="text"
           name="goal"
           placeholder="Goal"
+          value={goal}
+          onChange={(e) => setGoal(e.target.value)}
         />
       </div>
+
       <div className="form-group mb-3">
         <label htmlFor="tags">Tags</label>
         <input
           className="form-control"
           type="text"
           name="tags"
-          placeholder="Health, Fitness, Lifestyle"
+          placeholder="health, fitness, lifestyle"
+          value={tags}
+          onChange={handleTags}
         />
       </div>
+
+      <div className="form-group mb-3">
+        <label htmlFor="deadline">Deadline</label>
+        <input
+          className="form-control"
+          type="date"
+          name="deadline"
+          value={deadline}
+          onChange={(e) => setDeadline(e.target.value)}
+        />
+      </div>
+
       <Button>Add Goal</Button>
     </form>
   );
