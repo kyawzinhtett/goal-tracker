@@ -31,6 +31,7 @@ const App = () => {
 
   const handleAddGoal = (newGoal) => {
     setGoals((goals) => [...goals, newGoal]);
+    setOpenAddGoal(false);
   };
 
   return (
@@ -45,12 +46,7 @@ const App = () => {
             <Button onClick={handleOpenAddGoal}>
               {openAddGoal ? "Close" : "New Goal"}
             </Button>
-            {openAddGoal && (
-              <AddGoalForm
-                onAddGoal={handleAddGoal}
-                onOpenAddGoal={setOpenAddGoal}
-              />
-            )}
+            {openAddGoal && <AddGoalForm onAddGoal={handleAddGoal} />}
           </div>
         </div>
       </div>
@@ -113,7 +109,7 @@ const Goal = ({ goal, tags, deadline }) => {
   );
 };
 
-const AddGoalForm = ({ onAddGoal, onOpenAddGoal }) => {
+const AddGoalForm = ({ onAddGoal }) => {
   const [goal, setGoal] = useState("");
   const [tags, setTags] = useState([]);
   const [deadline, setDeadline] = useState("");
@@ -144,7 +140,6 @@ const AddGoalForm = ({ onAddGoal, onOpenAddGoal }) => {
     setGoal("");
     setTags([]);
     setDeadline("");
-    onOpenAddGoal(false);
   };
 
   return (
