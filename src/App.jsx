@@ -1,3 +1,5 @@
+import { useState } from "react";
+
 const initialGoals = [
   {
     id: 118836,
@@ -17,6 +19,12 @@ const initialGoals = [
 ];
 
 const App = () => {
+  const [openAddGoal, setOpenAddGoal] = useState(false);
+
+  function handleOpenAddGoal() {
+    setOpenAddGoal((prev) => !prev);
+  }
+
   return (
     <>
       <Navbar />
@@ -25,10 +33,23 @@ const App = () => {
           <div className="col-md-9">
             <List />
           </div>
-          <div className="col-md-3"></div>
+          <div className="col-md-3">
+            <Button onClick={handleOpenAddGoal}>
+              {openAddGoal ? "Close" : "New Goal"}
+            </Button>
+            {openAddGoal && <AddGoalForm />}
+          </div>
         </div>
       </div>
     </>
+  );
+};
+
+const Button = ({ children, onClick }) => {
+  return (
+    <button className="btn btn-sm btn-warning" onClick={onClick}>
+      {children}
+    </button>
   );
 };
 
@@ -71,6 +92,32 @@ const Goal = ({ goal, tags }) => {
         </div>
       </div>
     </div>
+  );
+};
+
+const AddGoalForm = () => {
+  return (
+    <form className="bg-light rounded mt-3 p-4">
+      <div className="form-group mb-3">
+        <label htmlFor="goal">Goal</label>
+        <input
+          className="form-control"
+          type="text"
+          name="goal"
+          placeholder="Goal"
+        />
+      </div>
+      <div className="form-group mb-3">
+        <label htmlFor="tags">Tags</label>
+        <input
+          className="form-control"
+          type="text"
+          name="tags"
+          placeholder="Health, Fitness, Lifestyle"
+        />
+      </div>
+      <Button>Add Goal</Button>
+    </form>
   );
 };
 
