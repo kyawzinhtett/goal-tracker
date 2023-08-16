@@ -6,18 +6,21 @@ const initialGoals = [
     goal: "🏆 Lose 20 lbs",
     tags: ["health", "fitness", "lifestyle"],
     deadline: "2023-09-15",
+    isCompleted: true,
   },
   {
     id: 933372,
     goal: "👩‍💻 Learn TypeScript",
     tags: ["programming", "software"],
     deadline: "2023-09-25",
+    isCompleted: false,
   },
   {
     id: 499476,
     goal: "💰 Find Remote Job",
     tags: ["work", "lifestyle"],
     deadline: "2023-10-20",
+    isCompleted: false,
   },
 ];
 
@@ -34,13 +37,23 @@ const App = () => {
     setOpenAddGoal(false);
   };
 
+  const handleCompleteGoal = (e, completeGoal) => {
+    setGoals((goals) =>
+      goals.map((goal) =>
+        goal.id === completeGoal.id
+          ? { ...goal, isCompleted: e.target.checked }
+          : goal
+      )
+    );
+  };
+
   return (
     <>
       <Navbar />
       <div className="container-fluid p-3">
         <div className="row">
           <div className="col-md-9">
-            <List goals={goals} />
+            <List goals={goals} onCompleteGoal={handleCompleteGoal} />
           </div>
           <div className="col-md-3">
             <Button onClick={handleOpenAddGoal}>
@@ -64,7 +77,7 @@ const Button = ({ children, onClick }) => {
 
 const Navbar = () => {
   return (
-    <nav className="navbar bg-body-tertiary">
+    <nav className="navbar bg-warning">
       <div className="container-fluid">
         <a className="navbar-brand" href="#">
           GoalTracker
@@ -74,34 +87,48 @@ const Navbar = () => {
   );
 };
 
-const List = ({ goals }) => {
+const List = ({ goals, onCompleteGoal }) => {
   return (
     <div className="row">
       {goals.map((goal) => (
-        <Goal
-          key={goal.id}
-          goal={goal.goal}
-          tags={goal.tags}
-          deadline={goal.deadline}
-        />
+        <Goal key={goal.id} goal={goal} onCompleteGoal={onCompleteGoal} />
       ))}
     </div>
   );
 };
 
-const Goal = ({ goal, tags, deadline }) => {
+const Goal = ({ goal, onCompleteGoal }) => {
   return (
     <div className="col-lg-3 col-md-4 col-sm-6">
-      <div className="card bg-light mb-3">
+      <div
+        className={`card mb-3 ${goal.isCompleted ? "bg-warning" : "bg-light"}`}
+      >
         <div className="card-body">
-          <h5 className="card-title pb-2">{goal}</h5>
+          <h5 className="card-title pb-2">{goal.goal}</h5>
           <div className="card-text">
-            <p>{deadline}</p>
-            {tags.map((tag, index) => (
-              <small key={index} className="bg-info rounded px-1 me-1">
+            <p>{goal.deadline}</p>
+            {goal.tags.map((tag, index) => (
+              <small
+                key={index}
+                className={`${
+                  goal.isCompleted ? "bg-light" : "bg-warning"
+                } rounded px-1 me-1`}
+              >
                 {tag}
               </small>
             ))}
+            <div className="form-check mt-2">
+              <input
+                className="form-check-input"
+                type="checkbox"
+                value=""
+                checked={goal.isCompleted}
+                onChange={(e) => onCompleteGoal(e, goal)}
+              />
+              <label className="form-check-label" htmlFor="isCompleted">
+                Mark as complete
+              </label>
+            </div>
           </div>
         </div>
       </div>
@@ -127,12 +154,14 @@ const AddGoalForm = ({ onAddGoal }) => {
     if (!goal || !tags || !deadline) return;
 
     const id = crypto.randomUUID();
+    const isCompleted = false;
 
     const newGoal = {
       id,
       goal,
       tags,
       deadline,
+      isCompleted,
     };
 
     onAddGoal(newGoal);
