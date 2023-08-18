@@ -50,28 +50,16 @@ const App = () => {
   return (
     <>
       <Navbar />
-      <div className="container-fluid p-3">
-        <div className="row">
-          <div className="col-md-9">
-            <List goals={goals} onCompleteGoal={handleCompleteGoal} />
-          </div>
-          <div className="col-md-3">
-            <Button onClick={handleOpenAddGoal}>
-              {openAddGoal ? "Close" : "New Goal"}
-            </Button>
-            {openAddGoal && <AddGoalForm onAddGoal={handleAddGoal} />}
-          </div>
-        </div>
-      </div>
+      <Main>
+        <GoalLists goals={goals} onCompleteGoal={handleCompleteGoal} />
+        <GoalForm>
+          <Button onClick={handleOpenAddGoal}>
+            {openAddGoal ? "Close" : "New Goal"}
+          </Button>
+          {openAddGoal && <AddGoalForm onAddGoal={handleAddGoal} />}
+        </GoalForm>
+      </Main>
     </>
-  );
-};
-
-const Button = ({ children, onClick }) => {
-  return (
-    <button className="btn btn-sm btn-warning" onClick={onClick}>
-      {children}
-    </button>
   );
 };
 
@@ -87,12 +75,22 @@ const Navbar = () => {
   );
 };
 
-const List = ({ goals, onCompleteGoal }) => {
+const Main = ({ children }) => {
   return (
-    <div className="row">
-      {goals.map((goal) => (
-        <Goal key={goal.id} goal={goal} onCompleteGoal={onCompleteGoal} />
-      ))}
+    <div className="container-fluid p-3">
+      <div className="row">{children}</div>
+    </div>
+  );
+};
+
+const GoalLists = ({ goals, onCompleteGoal }) => {
+  return (
+    <div className="col-md-9">
+      <div className="row">
+        {goals.map((goal) => (
+          <Goal key={goal.id} goal={goal} onCompleteGoal={onCompleteGoal} />
+        ))}
+      </div>
     </div>
   );
 };
@@ -134,6 +132,10 @@ const Goal = ({ goal, onCompleteGoal }) => {
       </div>
     </div>
   );
+};
+
+const GoalForm = ({ children }) => {
+  return <div className="col-md-3">{children}</div>;
 };
 
 const AddGoalForm = ({ onAddGoal }) => {
@@ -210,6 +212,14 @@ const AddGoalForm = ({ onAddGoal }) => {
 
       <Button>Add Goal</Button>
     </form>
+  );
+};
+
+const Button = ({ children, onClick }) => {
+  return (
+    <button className="btn btn-sm btn-warning" onClick={onClick}>
+      {children}
+    </button>
   );
 };
 
